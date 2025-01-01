@@ -4,37 +4,30 @@
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
       <div class="form-group mb-3">
         <label for="usernameOrEmail" class="form-label">Username or Email</label>
-        <input
-          type="text"
-          id="usernameOrEmail"
-          class="form-control"
-          [(ngModel)]="usernameOrEmail"
-          name="usernameOrEmail"
-          placeholder="Enter your username or email"
-          #usernameOrEmailField="ngModel"
-          required
-        />
+        <input type="text" id="usernameOrEmail" class="form-control" [(ngModel)]="usernameOrEmail"
+          name="usernameOrEmail" placeholder="Enter your username or email" #usernameOrEmailField="ngModel" required />
         <div class="invalid-feedback d-block" *ngIf="usernameOrEmailField.invalid && usernameOrEmailField.touched">
           Username or Email is required.
         </div>
       </div>
       <div class="form-group mb-3">
         <label for="password" class="form-label">Password</label>
-        <input
-          type="password"
-          id="password"
-          class="form-control"
-          [(ngModel)]="password"
-          name="password"
-          placeholder="Enter your password"
-          #passwordField="ngModel"
-          required
-        />
+        <input type="password" id="password" class="form-control" [(ngModel)]="password" name="password"
+          placeholder="Enter your password" #passwordField="ngModel" required />
         <div class="invalid-feedback d-block" *ngIf="passwordField.invalid && passwordField.touched">
           Password is required.
         </div>
       </div>
-      <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid">Login</button>
+      <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || isLoading"
+        [class.loading-animation]="isLoading">
+        {{ isLoading ? 'Loading...' : 'Login' }}
+      </button>
     </form>
+    <a href="#" class="wave-link" (mouseenter)="startWave()" (mouseleave)="stopWave()">
+      <span *ngFor="let char of linkText; let i = index" [style.animationDelay]="(i * 0.1) + 's'" class="wave-letter">
+        {{ char === ' ' ? '\u00A0' : char }}
+      </span>
+    </a>
+
   </div>
 </div>

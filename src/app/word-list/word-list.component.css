@@ -1,0 +1,62 @@
+.container {
+    padding-top: 65px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    background-color: transparent;
+}
+
+.table thead tr th {
+    background-color: #eeeeee;
+    padding: 10px;
+}
+
+.common-td {
+    padding: 10px;
+    background-color: transparent;
+}
+
+.td-with-buttons {
+    padding: 0px;
+    position: relative;
+    background-color: transparent;
+    
+}
+
+.td-with-buttons span {
+    background-color: transparent;
+    padding: 10px;
+    display: inline-block;
+    background-color: transparent;
+}
+
+.td-with-buttons div {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+fa-icon {
+    color: #3f3f3f;
+}
+
+.collection-control {
+    display: flex;
+    margin-top: 10px;
+}
+
+.collection-control fa-icon {
+    color: white;
+}

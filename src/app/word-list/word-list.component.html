@@ -1,1 +1,41 @@
-<p>word-list works!</p>
+<div class="container gap-3">
+    <div class="collection-control gap-2">
+        <select 
+            style="max-width: 300px;" 
+            class="form-select" 
+            aria-label="Words collection" 
+            [(ngModel)]="selectedWordsCollection">
+            <option selected disabled>Please create collection</option>
+            <option *ngFor="let collection of wordsCollections" [ngValue]="collection">
+                {{ collection.title }} {{ collection.language }}
+            </option>
+        </select>
+        <button id="crate-words-collection-btn" class="btn btn-primary btn-create">
+            <fa-icon class="me-1" [icon]="faPlus"></fa-icon>Create
+        </button>
+        <button id="add-word-btn" class="btn btn-primary btn-create">
+            <fa-icon class="me-1" [icon]="faPlus"></fa-icon>Add
+        </button>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Word</th>
+                <th>Translate</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let word of selectedWordsCollection?.words">
+                <td class="common-td">{{ word.text }}</td>
+                <td class="td-with-buttons">
+                    <span>{{ word.translate }}</span>
+                    <div style="float: right;">
+                        <button class="btn"><fa-icon [icon]="faPenToSquare"></fa-icon></button>
+                        <button class="btn"><fa-icon [icon]="faEye"></fa-icon></button>
+                        <button class="btn"><fa-icon [icon]="faTrash"></fa-icon></button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
