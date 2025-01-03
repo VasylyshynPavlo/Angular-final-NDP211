@@ -23,7 +23,13 @@ export interface WordsCollections {
     WordCollection: WordsCollection[];
 }
 
-export interface getWordCollectionsResponse {
+export interface GetWordCollectionsResponse {
     code: string
     data: WordsCollection[];
+}
+
+export interface TypicalResponse {
+    code: number;
+    message: string;
+    data: any;
 }

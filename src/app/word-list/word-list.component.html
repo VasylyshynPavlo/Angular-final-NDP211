@@ -1,9 +1,6 @@
 <div class="container gap-3">
     <div class="collection-control gap-2">
-        <select 
-            style="max-width: 300px;" 
-            class="form-select" 
-            aria-label="Words collection" 
+        <select style="max-width: 300px;" class="form-select" aria-label="Words collection"
             [(ngModel)]="selectedWordsCollection">
             <option selected disabled>Please create collection</option>
             <option *ngFor="let collection of wordsCollections" [ngValue]="collection">
@@ -30,9 +27,129 @@
                 <td class="td-with-buttons">
                     <span>{{ word.translate }}</span>
                     <div style="float: right;">
-                        <button class="btn"><fa-icon [icon]="faPenToSquare"></fa-icon></button>
-                        <button class="btn"><fa-icon [icon]="faEye"></fa-icon></button>
-                        <button class="btn"><fa-icon [icon]="faTrash"></fa-icon></button>
+                        <button class="btn" (click)="openEditWordModal(WordEditModal, word)">
+                            <fa-icon [icon]="faPenToSquare"></fa-icon>
+                        </button>
+
+                        <ng-template #WordEditModal let-modal>
+                            <div class="modal-header">
+                                <h4 class="modal-title" style="font-weight: 700;">Edit Word: {{ editableWord.text }}
+                                </h4>
+                                <button type="button" class="btn-close" aria-label="Close"
+                                    (click)="modal.dismiss('cancel click')"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" [(ngModel)]="editableWord.text"
+                                            name="wordText" id="wordText">
+                                        <label for="wordText">Word</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" [(ngModel)]="editableWord.translate"
+                                            name="wordTranslate" id="wordTranslate">
+                                        <label for="wordTranslate">Translate</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" [(ngModel)]="editableWord.description"
+                                            name="wordDescription" id="wordDescription">
+                                        <label for="wordDescription">Description</label>
+                                    </div>
+
+                                    <span style="font-weight: 600;">Examples:</span>
+                                    <hr>
+                                    <span *ngIf="editableWord.examples.length === 0" class="text-secondary"
+                                        style="font-style: italic;">Empty</span>
+                                    <div class="gap-3 d-flex flex-column">
+                                        <div *ngFor="let example of editableWord.examples; let i = index" class="card">
+                                            <div class="card-body gap-3 d-flex flex-column">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control"
+                                                        [(ngModel)]="editableWord.examples[i].text"
+                                                        name="exampleText-{{i}}" id="exampleText-{{i}}">
+                                                    <label for="exampleText-{{i}}">Example Text</label>
+                                                </div>
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control"
+                                                        [(ngModel)]="editableWord.examples[i].translate"
+                                                        name="exampleTranslate-{{i}}" id="exampleTranslate-{{i}}">
+                                                    <label for="exampleTranslate-{{i}}">Example Translate</label>
+                                                </div>
+                                                <button type="button" class="btn btn-danger mt-2"
+                                                    (click)="removeExample(i)">Remove Example</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary mt-3" (click)="addExample()">Add
+                                        Example</button>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="modal.dismiss('cancel click')">Cancel</button>
+                                <button type="button" class="btn btn-primary" (click)="saveWord(modal)">Save</button>
+                            </div>
+                        </ng-template>
+
+
+                        <ng-template #WordViewModal let-modal>
+                            <div class="modal-header">
+                                <h4 class="modal-title" style="font-weight: 700;">{{word.text}}</h4>
+                                <button ngbAutofocus type="button" class="btn-close" aria-label="Close"
+                                    (click)="modal.close('Close click')"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="d-flex flex-column mb-3" action="">
+                                    <div class="gap-3 d-flex flex-column">
+                                        <div class="form-floating">
+                                            <input disabled type="text" class="form-control"
+                                                aria-label="Sizing example input"
+                                                aria-describedby="inputGroup-sizing-default" value="{{word.translate}}"
+                                                id="WordViewMadalText">
+                                            <label for="WordViewMadalText">Text</label>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input disabled type="text" class="form-control"
+                                                aria-label="Sizing example input"
+                                                aria-describedby="inputGroup-sizing-default"
+                                                value="{{word.description}}" id="WordViewMadalTranslate">
+                                            <label for="WordViewMadalTranslate">Translate</label>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <span style="font-weight: 600;">Examples:</span>
+                                    <hr>
+                                    <span style="font-style: italic;" class="text-secondary"
+                                        *ngIf="word.examples.length === 0">Empty</span>
+                                    <div class="gap-3 d-flex flex-column">
+                                        <div *ngFor="let example of word.examples" class="card">
+                                            <div class="card-body gap-3 d-flex flex-column">
+                                                <div class="form-floating">
+                                                    <input disabled type="text" class="form-control"
+                                                        aria-label="Sizing example input"
+                                                        aria-describedby="inputGroup-sizing-default"
+                                                        value="{{example.text}}"
+                                                        id="WordExampleViewMadalText-{{example.id}}">
+                                                    <label for="WordExampleViewMadalText-{{example.id}}">Text</label>
+                                                </div>
+                                                <div class="form-floating">
+                                                    <input disabled type="text" class="form-control"
+                                                        aria-label="Sizing example input"
+                                                        aria-describedby="inputGroup-sizing-default"
+                                                        value="{{example.translate}}"
+                                                        id="WordExampleViewMadalTranslate-{{example.id}}">
+                                                    <label
+                                                        for="WordExampleViewMadalTranslate-{{example.id}}">Translate</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </ng-template>
+                        <button class="btn" (click)="openViewWordModal(WordViewModal)"><fa-icon
+                                [icon]="faEye"></fa-icon></button>
+                        <button class="btn" (click)="deleteWord(word)"><fa-icon [icon]="faTrash"></fa-icon></button>
                     </div>
                 </td>
             </tr>
