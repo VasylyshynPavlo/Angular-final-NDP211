@@ -1,7 +1,7 @@
 export interface User {
-    avatarUrl: string | undefined,
-    username: string,
-    fullName: string | undefined,
-    email: string,
-    emailConfirmed: boolean,
+    avatarUrl: string | null,
+    username: string | null,
+    fullName: string | null,
+    email: string | null,
+    emailConfirmed: boolean | null,
 }
