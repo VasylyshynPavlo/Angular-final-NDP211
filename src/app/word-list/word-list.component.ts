@@ -21,30 +21,44 @@ export class WordListComponent implements OnInit {
   faTrash = faTrash;
   faPlus = faPlus;
   editableWord: any = {};
+  createWordsCollection: { language: string, title: string } = { language: 'null', title: 'null' };
+  addWord_: { text: string, description: string, translate: string } = { text: 'null', description: 'null', translate: 'null' };
 
   wordsCollections: WordsCollection[] = [];
   selectedWordsCollection: WordsCollection | null = null;
 
   openViewWordModal(content: TemplateRef<any>) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(content);
   }
 
   openEditWordModal(content: TemplateRef<any>, word: Word) {
-    // Копіюємо дані слова, щоб редагування не змінювало об'єкт до збереження
     this.editableWord = { ...word };
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(content);
+  }
+
+  openCreateCollectionModal(content: TemplateRef<any>) {
+    this.modalService.open(content)
+  }
+
+  openAddWordModal(content: TemplateRef<any>) {
+    this.modalService.open(content)
   }
 
   saveWord(modal: any) {
     if (this.selectedWordsCollection !== null) {
+      let transformedExamples: any = {}
       const index = this.selectedWordsCollection.words.findIndex(w => w.id === this.editableWord.id);
       if (index !== -1) {
-        // Оновлення слова в колекції
+        transformedExamples = this.editableWord.examples.map((example: any) => ({
+          text: example.text,
+          translate: example.translate
+        }));
         this.selectedWordsCollection.words[index] = { ...this.editableWord };
       }
-      console.log('Saved word:', this.editableWord);
 
-      // Закриття модального вікна
+      this.library.replaceExamples(this.selectedWordsCollection.id, this.editableWord.id, transformedExamples);
+      this.library.editWord(this.selectedWordsCollection.id, this.editableWord.id, this.editableWord.text, this.editableWord.translate, this.editableWord.description);
+
       modal.close();
     } else {
       console.error('No collection selected');
@@ -57,32 +71,49 @@ export class WordListComponent implements OnInit {
     }
     this.editableWord.examples.push({ id: Date.now(), text: '', translate: '' });
   }
-  
+
   removeExample(index: number) {
     if (this.editableWord.examples) {
       this.editableWord.examples.splice(index, 1);
     }
   }
 
+  async createCollection(modal: any) {
+    await this.library.createWordsCollection(this.createWordsCollection.language, this.createWordsCollection.title);
+    modal.close();
+    this.Reload();
+  }
+
+  async deleteWordsCollection() {
+    if (this.selectedWordsCollection !== null)
+      await this.library.deleteWordsCollection(this.selectedWordsCollection?.id);
+    this.selectedWordsCollection = this.wordsCollections.length > 0 ? this.wordsCollections[0] : null;
+    this.Reload();
+  }
+
   private Reload() {
-    this.library.getWordCollections().subscribe((response) => {
-      this.wordsCollections = response.data;
-      if (this.wordsCollections.length > 0) {
-        this.selectedWordsCollection = this.wordsCollections[0];
-      }
+    this.selectedWordsCollection = null;
+    setTimeout(() => {
+      this.library.getWordCollections().subscribe((response) => {
+        this.wordsCollections = response.data;
+
+        if (this.wordsCollections.length > 0) {
+          this.selectedWordsCollection = this.wordsCollections[0];
+        }
+      });
     });
+  }
+
+  async addWord(modal: any) {
+    if (this.selectedWordsCollection !== null)
+      await this.library.addWord(this.selectedWordsCollection?.id, this.addWord_.text, this.addWord_.description, this.addWord_.translate);
+    modal.close();
+
+    this.Reload();
   }
 
   ngOnInit(): void {
     this.Reload();
-  }
-
-  editWord(word: Word) {
-
-  }
-
-  viewWord(word: Word) {
-
   }
 
   async deleteWord(word: Word) {

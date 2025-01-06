@@ -20,54 +20,43 @@ export class LibraryService {
     return this.http.get<GetWordCollectionsResponse>(this.libraryControllerUrl + 'collections', { headers });
   }
 
-  deleteWord(collectionId: string, wordId: string): any {
+  deleteWord(collectionId: string, wordId: string) {
     const token = this.auth.getToken();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
     this.http.delete<TypicalResponse>(this.libraryControllerUrl + `words?collectionId=${collectionId}&wordId=${wordId}`, { headers }).subscribe({
-      next: (response) => {
-        if (response.code === 200) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      },
       error: (err) => {
-        return false;
+        console.error(err);
       }
     });
   }
 
-  addWord(collectionId: string, word: Word): any {
+  addWord(collectionId: string, text: string, description: string | null, translate: string | null) {
     const token = this.auth.getToken();
+
     const formData = new FormData();
-    formData.append('Text', word.text);
-    if (word.description !== null) {
-      formData.append('Description', word.description)
+    formData.append('Text', text);
+    if (description !== null) {
+      formData.append('Description', description)
     }
-    if (word.translate !== null) {
-      formData.append('Translate', word.translate);
+    if (translate !== null) {
+      formData.append('Translate', translate);
     };
-    const header = new HttpHeaders({
+    const headers = new HttpHeaders({
       Authorization: `Bearer: ${token}`,
     });
-    this.http.post<TypicalResponse>(this.libraryControllerUrl + `words?collectionId=${collectionId}`, { header }).subscribe({
-      next: (response) => {
-        if (response.code === 200) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      },
+    console.log(`Authorization: Bearer: ${token}`);
+    console.log(this.libraryControllerUrl + `words?collectionId=${collectionId}`);
+
+
+    this.http.post<TypicalResponse>(this.libraryControllerUrl + `words?collectionId=${collectionId}`, formData, { headers }).subscribe({
       error: (err) => {
-        return false;
+        console.log(err)
       }
     })
   }
-  // words?collectionId=1&wordId=1&text=1&translate=1&description=1
+
   async editWord(
     collectionId: string,
     wordId: string,
@@ -75,7 +64,7 @@ export class LibraryService {
     translate: string | null = null,
     description: string | null = null
   ): Promise<boolean> {
-    let resposne: boolean = true;
+    let toResposne: boolean = true;
     const token = this.auth.getToken();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
@@ -89,20 +78,62 @@ export class LibraryService {
 
     try {
       const response = await lastValueFrom(
-        this.http.put<TypicalResponse>(this.libraryControllerUrl + url, { headers })
+        this.http.put<TypicalResponse>(
+          `${this.libraryControllerUrl}${url}`,
+          {},
+          { headers }
+        )
       );
 
-      if (response.code === 200) {
-        resposne = true;
-      } else {
-        console.error('Something went wrong!');
-        resposne = true;
-      }
+      toResposne = true;
     } catch (error) {
       console.error('Error in editWord:', error);
-      resposne = false;
+      toResposne = false;
     }
-    return resposne;
+
+    return toResposne;
   }
 
+  replaceExamples(collectionId: string, wordId: string, examples: { text: string, translate: string }) {
+    const url: string = this.libraryControllerUrl + `examples/many?collectionId=${collectionId}&wordId=${wordId}`
+    const token = this.auth.getToken();
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    })
+    try {
+      this.http.post(url, examples, { headers })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  createWordsCollection(language: string, title: string) {
+    const url: string = this.libraryControllerUrl + 'collections';
+    const token = this.auth.getToken();
+    const formData = new FormData();
+    formData.append('Language', language);
+    formData.append('Title', title);
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    this.http.post(url, formData, { headers }).subscribe({
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  deleteWordsCollection(collectionId: string) {
+    const url: string = this.libraryControllerUrl + `collections?collectionId=${collectionId}`;
+    const token = this.auth.getToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    this.http.delete(url, { headers }).subscribe({
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
 }
